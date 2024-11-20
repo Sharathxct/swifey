@@ -9,7 +9,6 @@ import { Platform } from 'react-native';
 import { NAV_THEME } from '~/lib/constants';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { PortalHost } from '@rn-primitives/portal';
-import { ThemeToggle } from '~/components/ThemeToggle';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
 
 const LIGHT_THEME: Theme = {
@@ -22,11 +21,9 @@ const DARK_THEME: Theme = {
 };
 
 export {
-  // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from 'expo-router';
 
-// Prevent the splash screen from auto-hiding before getting the color scheme.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -37,7 +34,6 @@ export default function RootLayout() {
     (async () => {
       const theme = await AsyncStorage.getItem('theme');
       if (Platform.OS === 'web') {
-        // Adds the background color to the html element to prevent white background on overscroll.
         document.documentElement.classList.add('bg-background');
       }
       if (!theme) {
