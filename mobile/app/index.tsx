@@ -24,6 +24,7 @@ export default function Screen() {
         By continuing you accept to our terms and conditions.
         <Text className='underline'>Terms and Conditions</Text>
       </Text>
+
     </View>
   );
 }
