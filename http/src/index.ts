@@ -1,32 +1,20 @@
 import express from "express";
 import mongoose from "mongoose"
-import { User } from "./models/user";
+import router from "./routes";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 
 app.get("/", (_req, res) => {
-  res.send("Hello World!");
+  res.send("Helthy");
 });
 
-app.get("/test", (_req, res) => {
-  const user = new User({
-    name: "sharath",
-    email: "sharath@swifey",
-    password: "1234",
-    dob: new Date(),
-    gender: "male",
-    college: "vit",
-    company: "swifey",
-  });
+app.use("/api", router);
 
-  user.save().then((user) => {
-    res.send(user);
-  });
-
-});
-
-
-mongoose.connect("mongodb+srv://sharath:1234@cluster0.fshqrdi.mongodb.net/swifey").then(() => {
+//@ts-ignore
+mongoose.connect(process.env.MONGODB_URI).then(() => {
   app.listen(3000, () => {
     console.log("Server started on port 3000 and connected to mongodb");
   })

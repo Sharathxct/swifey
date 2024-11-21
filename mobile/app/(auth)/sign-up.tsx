@@ -4,8 +4,6 @@ import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Link } from 'expo-router';
 import { router } from 'expo-router';
-import RNDateTimePicker from '@react-native-community/datetimepicker';
-import Example from '~/components/Example';
 
 export default function SignUpScreen() {
   const onPress = () => {
@@ -23,11 +21,9 @@ export default function SignUpScreen() {
           <Text>Password</Text>
           <Input className='rounded-full border-none bg-transparent text-primary placeholder:text-muted-foreground  p-2' />
           <Text>Date of Birth</Text>
-          <RNDateTimePicker value={new Date()} display="spinner" />
-
-
+          <Input className='rounded-full border-none bg-transparent text-primary placeholder:text-muted-foreground  p-2' />
           <Text>Gender</Text>
-          <Example />
+          <Text>Dropdown here</Text>
 
           <Text>College</Text>
           <Input className='rounded-full border-none bg-transparent text-primary placeholder:text-muted-foreground  p-2' />
