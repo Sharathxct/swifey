@@ -1,15 +1,15 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import { type } from "os";
 
 const userSchema = new mongoose.Schema({
-  name: {
+  username: {
     type: String,
     required: true,
   },
   email: {
     type: String,
     required: true,
-    unique: true,
   },
   password: {
     type: String,
@@ -35,7 +35,10 @@ const userSchema = new mongoose.Schema({
   walletBalance: {
     type: Number,
     default: 0,
-  }
+  },
+
+  connections: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", }],
+
 });
 
 userSchema.pre("save", async function(next) {

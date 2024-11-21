@@ -1,6 +1,6 @@
 import auth from "./auth";
 import swipe from "./swipe";
-import profile from "./profiles";
+import profile from "./profile";
 import sol from "./sol";
 import { Router } from "express";
 

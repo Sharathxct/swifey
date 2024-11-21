@@ -2,8 +2,10 @@ import { Router } from "express";
 
 const profile = Router();
 
-profile.post("/",);
+profile.put("/",);
 
-profile.get("/",);
+profile.get("/users",);
+
+profile.get("/MyConnections",);
 
 export default profile;

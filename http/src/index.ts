@@ -2,11 +2,13 @@ import express from "express";
 import mongoose from "mongoose"
 import router from "./routes";
 import dotenv from "dotenv";
+import neo4j from "neo4j-driver";
 
 dotenv.config();
 
 const app = express();
 
+app.use(express.json())
 app.get("/", (_req, res) => {
   res.send("Helthy");
 });
@@ -19,3 +21,4 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
     console.log("Server started on port 3000 and connected to mongodb");
   })
 }).catch((e) => console.log(e))
+

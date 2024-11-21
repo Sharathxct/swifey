@@ -2,8 +2,8 @@ import { Router } from "express";
 
 const swipe = Router();
 
-swipe.post("/",);
+swipe.post("/right",);
 
-swipe.get("/",);
+swipe.post("/left",);
 
 export default swipe;

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { login, signup } from "../controller/auth";
+import { signin, signup } from "../controller/auth";
 
 const auth = Router();
 
@@ -7,6 +7,6 @@ const auth = Router();
 auth.post("/signup", signup);
 
 //@ts-ignore
-auth.post("/signin", login);
+auth.post("/signin", signin);
 
 export default auth;

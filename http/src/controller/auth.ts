@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { User } from "../models/user";
 import jwt from "jsonwebtoken";
+import Graphdb from "../db";
 
-export const login = async (req: Request, res: Response) => {
+export const signin = async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   const user = await User.findOne({ username });
@@ -24,8 +25,24 @@ export const login = async (req: Request, res: Response) => {
   res.send({ token });
 }
 
+function convertToDate(dateString: string): Date | null {
+  const parts = dateString.split('-');  // Split by '-'
+  if (parts.length !== 3) {
+    console.error('Invalid date format');
+    return null;
+  }
+
+  const day = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10) - 1;  // Month is 0-indexed in JavaScript (0 = January, 11 = December)
+  const year = parseInt(parts[2], 10);
+
+  // Return the Date object
+  return new Date(year, month, day);
+}
+
 export const signup = async (req: Request, res: Response) => {
   const { username, email, password, dob, gender, college, company } = req.body;
+  console.log("signup req received", username, email, password, dob, gender, college, company)
   const check = await User.findOne({ username });
 
   if (check) {
@@ -35,23 +52,25 @@ export const signup = async (req: Request, res: Response) => {
   const user = new User({
     username,
     email,
-    dob,
+    dob: convertToDate(dob),
     password,
     gender,
     college,
     company
   });
 
-  await user.save().then(() => {
-    res.send("signup");
+
+  user.save().then(() => {
+    console.log("user created", user)
+    Graphdb.creatUser(user.username, user._id.toString()).then((a) => {
+      console.log(a)
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string);
+      res.send({ token });
+    })
   }).catch((e) => {
-    res.status(500).send(e);
+    console.log(e);
+    res.status(500).send({ error: "server error" })
   });
-
-  //@ts-ignore
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-
-  res.send({ token });
 }
 
 
