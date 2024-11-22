@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Graphdb from "../db";
+import { Connection } from "../models/connection";
 
 const getProfiles = async (req: Request, res: Response) => {
   //@ts-ignore
@@ -7,12 +8,18 @@ const getProfiles = async (req: Request, res: Response) => {
   res.send(users);
 }
 
-const getConversation = async (_req: Request, res: Response) => {
+const getMyConnections = async (req: Request, res: Response) => {
   //@ts-ignore
-  res.send("TODO");
+  const { userId } = req.user;
+  const connections = await Connection.find({ to: userId });
+  if (!connections) {
+    return res.status(200).send([]);
+  }
+  res.send(connections);
 }
+
 
 export {
   getProfiles,
-  getConversation
+  getMyConnections
 }

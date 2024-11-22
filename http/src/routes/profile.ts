@@ -1,12 +1,15 @@
 import { Router } from "express";
-import { getProfiles } from "../controller/profile";
+import { getProfiles, getMyConnections } from "../controller/profile";
+import { auth } from "../middleware/auth";
 
 const profile = Router();
 
 profile.put("/",);
 
-profile.get("/profiles", getProfiles);
+//@ts-ignore
+profile.get("/profiles", auth, getProfiles);
 
-profile.get("/MyConnections",);
+//@ts-ignore
+profile.get("/MyConnections", auth, getMyConnections);
 
 export default profile;

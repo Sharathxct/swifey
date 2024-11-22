@@ -1,12 +1,13 @@
 import { Router } from "express";
 import { getConversation, getMessages } from "../controller/chat";
+import { auth } from "../middleware/auth";
 
 const chat = Router();
 
 //@ts-ignore
-chat.post("/getConversation", getConversation);
+chat.post("/getConversation", auth, getConversation);
 
-// user will send an array of messageIds 
-chat.post("/messages", getMessages)
+// @ts-ignore
+chat.post("/messages", auth, getMessages)
 
 export default chat;
