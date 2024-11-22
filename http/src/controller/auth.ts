@@ -33,7 +33,7 @@ function convertToDate(dateString: string): Date | null {
   }
 
   const day = parseInt(parts[0], 10);
-  const month = parseInt(parts[1], 10) - 1;  // Month is 0-indexed in JavaScript (0 = January, 11 = December)
+  const month = parseInt(parts[1], 10) - 1;
   const year = parseInt(parts[2], 10);
 
   // Return the Date object
@@ -44,6 +44,7 @@ export const signup = async (req: Request, res: Response) => {
   const { username, email, password, dob, gender, college, company } = req.body;
   console.log("signup req received", username, email, password, dob, gender, college, company)
   const check = await User.findOne({ username });
+  let flag = false;
 
   if (check) {
     return res.status(400).send("Username taken");
@@ -61,16 +62,25 @@ export const signup = async (req: Request, res: Response) => {
 
 
   user.save().then(() => {
+    flag = true;
     console.log("user created", user)
     Graphdb.creatUser(user.username, user._id.toString()).then((a) => {
       console.log(a)
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string);
       res.send({ token });
     })
-  }).catch((e) => {
-    console.log(e);
-    res.status(500).send({ error: "server error" })
-  });
+  })
+    .catch((e) => {
+      console.log(e);
+      if (flag) {
+        // delete user object from mongodb
+        User.deleteOne({ _id: user._id }).then(() => {
+          res.status(500).send({ error: "server error" })
+        })
+      } else {
+        res.status(500).send({ error: "server error" })
+      }
+    });
 }
 
 

@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import { type } from "os";
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -33,7 +32,7 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   walletBalance: {
-    type: Number,
+    type: String,
     default: 0,
   },
 

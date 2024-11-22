@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { signin, signup } from "../controller/auth";
+import Graphdb from "../db";
 
 const auth = Router();
 

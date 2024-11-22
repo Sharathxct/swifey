@@ -2,7 +2,6 @@ import express from "express";
 import mongoose from "mongoose"
 import router from "./routes";
 import dotenv from "dotenv";
-import neo4j from "neo4j-driver";
 
 dotenv.config();
 
