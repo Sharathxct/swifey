@@ -12,9 +12,15 @@ const transactionSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ["deposit", "withdraw"],
+    enum: ["deposit", "withdraw", "swipe"],
     required: true,
   },
+  receiver: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: false,
+  },
+
 }, { timestamps: true });
 
 export const Transaction = mongoose.model("Transaction", transactionSchema);
