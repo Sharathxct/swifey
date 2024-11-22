@@ -18,6 +18,7 @@ const right = async (req: Request, res: Response) => {
   // 5 network calls in right swipe verification of receiver, deduction of sol, update transaction, 
   // graphdb connection, relational db connection
   // Ideally check if we can manage connection in graphdb and delete the connections in relational db
+  // And make a db transaction to deduct sol and update the transaction
   if (!receiver) {
     return res.status(400).send("bad request");
   }
