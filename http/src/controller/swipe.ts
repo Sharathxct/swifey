@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { User } from "../models/user";
 import Graphdb from "../db";
 import { Transaction } from "../models/transactions";
+import { Connection } from "../models/connection";
 import mongoose from "mongoose";
 
 //TODO: reduce the number of network calls
@@ -80,7 +81,42 @@ const left = async (req: Request, res: Response) => {
   }
 }
 
+const accept = async (req: Request, res: Response) => {
+  const { conId } = req.body;
+  try {
+    const con = await Connection.findById(conId);
+    if (!con) {
+      return res.status(400).send("Connection not found");
+    }
+    con.status = "accepted";
+    con.save();
+    res.send("accepted");
+  } catch (e) {
+    console.log(e);
+    res.status(500).send({ error: "server error" })
+  }
+}
+
+const reject = async (req: Request, res: Response) => {
+  const { conId } = req.body;
+  try {
+    const con = await Connection.findById(conId);
+    if (!con) {
+      return res.status(400).send("Connection not found");
+    }
+    con.status = "rejected";
+    con.save();
+    res.send("rejected");
+  } catch (e) {
+    console.log(e);
+    res.status(500).send({ error: "server error" })
+  }
+}
+
+
 export {
   right,
-  left
+  left,
+  accept,
+  reject
 }
