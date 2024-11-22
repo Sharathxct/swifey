@@ -42,7 +42,8 @@ wss.on("connection", (ws, req) => {
   ws.on("message", (message) => {
     // publish to pubsub
     // send to queue for archiver to pick up and store in db
-    publisher.publish(JSON.parse(message.toString()).id, message.toString());
+    publisher.publish(JSON.parse(message.toString()).to, message.toString());
+    // { from, to, content, type }
     queue.lpush("archiver", message.toString());
     console.log(message);
   });

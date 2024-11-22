@@ -3,7 +3,7 @@ import Graphdb from "../db";
 
 const getProfiles = async (req: Request, res: Response) => {
   //@ts-ignore
-  const users = await Graphdb.usersWithNoCurrentUser(req.user.id);
+  const users = await Graphdb.usersWithNoCurrentUser(req.user.userId);
   res.send(users);
 }
 

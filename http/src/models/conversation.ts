@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const conversationSchema = new mongoose.Schema({
-  conversationId: { // fromUserId + toUserId
+  conversationId: {
     type: String,
     required: true,
   },

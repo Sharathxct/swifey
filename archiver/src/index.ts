@@ -23,7 +23,7 @@ function archiver() {
     } else {
       // save the message to the database with id fromUserId + toUserId
       // what will the message object from the queue look like?
-      // { fromUserId, toUserId, messageId, content, type }
+      // { fromUserId, toUserId, content, type }
       // transaction to creat a new message in the message model and update the conversation
       messageTransaction(message);
     }
