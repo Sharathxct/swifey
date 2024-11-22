@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { User } from "../models/user";
 import Graphdb from "../db";
+import { Transaction } from "../models/transactions";
 
 const right = async (req: Request, res: Response) => {
   //@ts-ignore
@@ -33,6 +34,12 @@ const right = async (req: Request, res: Response) => {
       }
       user.walletBalance = (parseFloat(user.walletBalance) - 0.2).toString();
       user.save();
+      const transaction = new Transaction({
+        userId,
+        amount: "0.2",
+        type: "swipe"
+      });
+      transaction.save();
     })
 
     Graphdb.likeUser(userId, receiver).then(() => {
