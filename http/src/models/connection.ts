@@ -13,7 +13,7 @@ const connectionSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["pending", "accepted", "rejected", "completed"],
+    enum: ["pending", "accepted", "rejected", "end"],
     required: true,
   }
 });

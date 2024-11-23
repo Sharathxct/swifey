@@ -17,23 +17,10 @@ class Graphdb {
     return this.driver;
   }
 
-  static async getSession() {
-    if (!this.session) {
-      try {
-        console.log(username, password, uri)
-        //@ts-ignore
-        this.session = await this.getDriver().session();
-      } catch (e) {
-        console.log(e);
-      }
-    }
-    return this.session;
-  }
-
-  static async creatUser(username: string, id: string) {
+  static async creatUser(username: string, id: string, dob: Date, gender: string, college: string, company: string) {
     try {
       const driver = Graphdb.getDriver();
-      const g = await driver.executeQuery(`CREATE (u: User { mongoId: $id, username: $username })`, { id, username });
+      const g = await driver.executeQuery(`CREATE (u: User { mongoId: $id, username: $username, dob: $dob, gender: $gender, college: $college, company: $company })`, { id, username, dob, gender, college, company });
       return g;
     } catch (err) {
       console.log(err)

@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { View, ImageBackground, Dimensions } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, ImageBackground, Dimensions, ActivityIndicator } from 'react-native';
 import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
@@ -8,20 +8,22 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import { Text } from '~/components/ui/text';
-import girl from '../assets/images/girl.png';
-import girl2 from '../assets/images/girl2.avif';
-import girl3 from '../assets/images/girl3.webp';
+import axios from 'axios';
+import { baseUrl } from '~/lib/constant';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
-function TinderCard({
+
+function ProfileCard({
   name = "Emma Johnson",
   age = 24,
   bio = "Software engineer | Travel enthusiast | Dog lover",
-  imageUri = girl,
+  imageUri,
   onSwipeLeft,
   onSwipeRight
-}) {
+}: any) {
   const translateX = useSharedValue(0);
   const rotateZ = useSharedValue(0);
 
@@ -36,7 +38,7 @@ function TinderCard({
     };
   });
 
-  const handleGestureStateChange = (event) => {
+  const handleGestureStateChange = (event: any) => {
     if (event.nativeEvent.state === State.END) {
       if (translateX.value > SCREEN_WIDTH / 3) {
         translateX.value = withSpring(SCREEN_WIDTH, { damping: 20, stiffness: 150 }, () => {
@@ -94,50 +96,73 @@ function TinderCard({
 }
 
 function SwipeableProfileStack() {
-  const [profiles, setProfiles] = React.useState([
-    {
-      id: '1',
-      name: "Emma Johnson",
-      age: 24,
-      bio: "Software engineer | Travel enthusiast",
-      imageUri: girl
-    },
-    {
-      id: '2',
-      name: "Shristi",
-      age: 24,
-      bio: "Software engineer | Travel enthusiast",
-      imageUri: girl2
-    },
-    {
-      id: '3',
-      name: "Anushka",
-      age: 24,
-      bio: "Software engineer | Travel enthusiast",
-      imageUri: girl3
-    },
-  ]);
+  const [profiles, setProfiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState('');
+
+  const getToken = async () => {
+    const token = await AsyncStorage.getItem('auth_token');
+    if (!token) {
+      return router.push('/(auth)/sign-in');
+    }
+    setToken(token);
+  }
+
+  const fetchNewBatch = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${baseUrl}/api/profile/profiles`, {
+        headers: {
+          Authorization: `${token}`
+        }
+      });
+      if (response.data && response.data.length > 0) {
+        setProfiles(response.data);
+      } else {
+        console.log("No more profiles");
+      }
+    } catch (error) {
+      console.error("Error fetching profiles:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getToken();
+    fetchNewBatch();
+  }, []);
 
   const handleSwipeRight = () => {
     console.log("right swipe");
-    setProfiles(prev => {
-      const [_current, ...rest] = prev;
+    setProfiles((prevProfiles) => {
+      const [_swipedProfile, ...rest] = prevProfiles;
       return rest;
     });
+    if (profiles.length <= 1) {
+      fetchNewBatch();
+    }
   };
 
   const handleSwipeLeft = () => {
     console.log("left swipe");
-    setProfiles(prev => {
-      const [_current, ...rest] = prev;
+    setProfiles((prevProfiles) => {
+      const [_swipedProfile, ...rest] = prevProfiles;
       return rest;
     });
+    if (profiles.length <= 1) {
+      fetchNewBatch();
+    }
   };
 
   return (
     <View style={{ flex: 1 }}>
-      {profiles.length > 0 ? (
-        <TinderCard
+      {loading ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      ) : profiles.length > 0 ? (
+        <ProfileCard
           key={profiles[0].id}
           {...profiles[0]}
           onSwipeRight={handleSwipeRight}

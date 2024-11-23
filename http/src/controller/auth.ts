@@ -64,7 +64,7 @@ export const signup = async (req: Request, res: Response) => {
   user.save().then(() => {
     flag = true;
     console.log("user created", user)
-    Graphdb.creatUser(user.username, user._id.toString()).then((a) => {
+    Graphdb.creatUser(user.username, user._id.toString(), user.dob, user.gender, user.college, user.company).then((a) => {
       console.log(a)
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string);
       res.send({ token });
