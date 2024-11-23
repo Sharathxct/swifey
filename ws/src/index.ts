@@ -51,7 +51,7 @@ wss.on("connection", (ws, req) => {
 });
 
 wss.on("listening", () => {
-  console.log("Listening on port 3000");
+  console.log("Listening on port 3001");
 });
 
 // on message publish to pubsub and send to the queue for archiver to pick up and store in db

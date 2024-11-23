@@ -1,10 +1,16 @@
 import { Router } from "express";
-import { deposit, withdraw } from "../controller/sol";
+import { deposit, withdraw, balance } from "../controller/sol";
+import { auth } from "../middleware/auth";
 
 const sol = Router();
 
-sol.post("/withdraw", withdraw);
+// @ts-ignore
+sol.post("/withdraw", auth, withdraw);
 
-sol.post("/deposit", deposit);
+// @ts-ignore
+sol.post("/deposit", auth, deposit);
+
+// @ts-ignore
+sol.get("/balance", auth, balance);
 
 export default sol;

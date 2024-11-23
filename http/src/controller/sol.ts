@@ -4,7 +4,9 @@ import { User } from "../models/user";
 const deposit = async (req: Request, res: Response) => {
   const { amount } = req.body;
   //@ts-ignore
-  const { userId } = req.user;
+  console.log(req.user)
+  //@ts-ignore
+  const userId = req.user.userId;
 
   try {
     User.findById(userId).then((user) => {
@@ -20,7 +22,6 @@ const deposit = async (req: Request, res: Response) => {
     console.log(e);
     res.status(500).send({ error: "server error" })
   }
-
 }
 
 const withdraw = async (req: Request, res: Response) => {
@@ -29,7 +30,18 @@ const withdraw = async (req: Request, res: Response) => {
   res.send("processing");
 }
 
+const balance = async (req: Request, res: Response) => {
+  //@ts-ignore
+  const userId = req.user.userId;
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(400).send("User not found");
+  }
+  res.send(user.walletBalance);
+}
+
 export {
   deposit,
-  withdraw
+  withdraw,
+  balance
 }

@@ -1,48 +1,202 @@
-import { View } from 'react-native';
+import { useState } from 'react';
+import { ScrollView, View, TextInput, Button, Alert } from 'react-native';
 import { Text } from '~/components/ui/text';
-import { Button } from '~/components/ui/button';
-import { Input } from '~/components/ui/input';
-import { Link } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { Radio } from '~/components/radio';
 import { router } from 'expo-router';
+import { baseUrl } from '~/lib/constant';
+import { Link } from 'expo-router';
 
 export default function SignUpScreen() {
-  const onPress = () => {
-    router.push('/(tabs)/home');
+  // Define state for form inputs
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [dob, setDob] = useState({ day: '', month: '', year: '' });
+  const [gender, setGender] = useState('');
+  const [college, setCollege] = useState('');
+  const [company, setCompany] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Function to handle the sign-up API request
+  const handleSignUp = async () => {
+    setIsLoading(true);
+
+    // Format the DOB from day, month, year to the required format
+    const formattedDob = `${dob.day}-${dob.month}-${dob.year}`;
+
+    try {
+      console.log("req data", username, email, password, dob, gender, college, company)
+      const response = await axios.post(baseUrl + '/api/auth/signup', {
+        username,
+        email,
+        password,
+        dob: formattedDob,
+        gender,
+        college,
+        company,
+      });
+      console.log("response", response)
+
+      const { token } = response.data;
+      await AsyncStorage.setItem('auth_token', token);
+      console.log(token)
+
+      router.push('/(tabs)/home');
+    } catch (error) {
+      console.error('Sign-up error', error);
+      Alert.alert('Error', 'There was an issue signing you up. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <View className='flex-1 min-h-[90vh] justify-between w-full  gap-5 p-6 bg-secondary/30'>
-      <View className='flex min-h-[80vh] justify-center w-full  gap-5  '>
-        <Text className='text-primary text-4xl mb-3'>Logo</Text>
-        <Text className='text-primary text-3xl'>Sign Up</Text>
-        <View className='flex gap-2 w-full'>
+    <ScrollView >
+      <View className="flex min-h-[80vh] justify-center w-full gap-5">
+        <Text className=" text-3xl">Sign Up</Text>
+        <View className="flex gap-2 w-full mt-5">
           <Text>Username</Text>
-          <Input className='rounded-full border-none bg-transparent text-primary placeholder:text-muted-foreground pl-5 p-2' />
+          <TextInput
+            style={{ height: 40, borderColor: 'gray', borderWidth: 1, borderRadius: 20, paddingLeft: 10 }}
+            className=' text-foreground'
+            value={username}
+            onChangeText={setUsername}
+            placeholder="Enter your username"
+          />
+
+          <Text>Email</Text>
+          <TextInput
+            style={{ height: 40, borderColor: 'gray', borderWidth: 1, borderRadius: 20, paddingLeft: 10 }}
+            className=' text-foreground'
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Enter your email"
+            keyboardType="email-address"
+          />
+
           <Text>Password</Text>
-          <Input className='rounded-full border-none bg-transparent text-primary placeholder:text-muted-foreground  p-2' />
+          <TextInput
+            style={{ height: 40, borderColor: 'gray', borderWidth: 1, borderRadius: 20, paddingLeft: 10 }}
+            className=' text-foreground'
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Enter your password"
+            secureTextEntry
+          />
+
           <Text>Date of Birth</Text>
-          <Input className='rounded-full border-none bg-transparent text-primary placeholder:text-muted-foreground  p-2' />
-          <Text>Gender</Text>
-          <Text>Dropdown here</Text>
+          <View className="flex pt-2 flex-row gap-2 w-full justify-around">
+            <TextInput
+              style={{ height: 40, borderColor: 'gray', borderWidth: 1, borderRadius: 20, paddingLeft: 10, flex: 1 }}
+              className=' text-foreground'
+              value={dob.day}
+              onChangeText={(text) => setDob({ ...dob, day: text })}
+              placeholder="DD"
+              keyboardType="numeric"
+            />
+            <TextInput
+              style={{ height: 40, borderColor: 'gray', borderWidth: 1, borderRadius: 20, paddingLeft: 10, flex: 1 }}
+              className=' text-foreground'
+              value={dob.month}
+              onChangeText={(text) => setDob({ ...dob, month: text })}
+              placeholder="MM"
+              keyboardType="numeric"
+            />
+            <TextInput
+              style={{ height: 40, borderColor: 'gray', borderWidth: 1, borderRadius: 20, paddingLeft: 10, flex: 2 }}
+              className=' text-foreground'
+              value={dob.year}
+              onChangeText={(text) => setDob({ ...dob, year: text })}
+              placeholder="YYYY"
+              keyboardType="numeric"
+            />
+          </View>
 
-          <Text>College</Text>
-          <Input className='rounded-full border-none bg-transparent text-primary placeholder:text-muted-foreground  p-2' />
+          <Text className="pt-4">Gender</Text>
+          <Radio value={gender} setValue={setGender} />
 
-          <Text>Company</Text>
-          <Input className='rounded-full border-none bg-transparent text-primary placeholder:text-muted-foreground  p-2' />
+          <Text className="pt-4">College</Text>
+          <TextInput
+            style={{ height: 40, borderColor: 'gray', borderWidth: 1, borderRadius: 20, paddingLeft: 10 }}
+            className=' text-foreground'
+            value={college}
+            onChangeText={setCollege}
+            placeholder="Enter your college"
+          />
 
+          <Text className="pt-4">Company</Text>
+          <TextInput
+            style={{ height: 40, borderColor: 'gray', borderWidth: 1, borderRadius: 20, paddingLeft: 10 }}
+            className=' text-foreground'
+            value={company}
+            onChangeText={setCompany}
+            placeholder="Enter your company"
+          />
         </View>
-        <Button className='bg-primary rounded-full text-primary w-full' onPress={onPress} >
-          <Text>Continue</Text>
-        </Button>
-        <Text className='text-center'>Have an account? <Link className='underline' href='/(auth)/sign-in'>Sign In</Link></Text>
+
+        <Button
+          title={isLoading ? 'Signing Up...' : 'Sign Up'}
+          onPress={handleSignUp}
+          disabled={isLoading}
+        />
+
+        <Text className="text-center">
+          Have an account?{' '}
+          <Link className='underline' href='/(auth)/sign-in'>Sign In</Link>
+        </Text>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
-// username text
-// dob date
-// Gender dropdown
-// College text
-// company text
+const styles = {
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  formContainer: {
+    padding: 16,
+    flex: 1,
+    justifyContent: 'center',
+  },
+  header: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+
+  formFields: {
+    marginBottom: 20,
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 20,
+    paddingLeft: 10,
+    marginBottom: 10,
+  },
+  dobContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  dobInput: {
+    flex: 1,
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 20,
+    paddingLeft: 10,
+    marginRight: 5,
+  },
+  loadingIndicator: {
+    marginTop: 10,
+  },
+  signInLink: {
+    textAlign: 'center',
+    marginTop: 20,
+  },
+};

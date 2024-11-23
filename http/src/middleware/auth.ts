@@ -10,9 +10,10 @@ export function auth(req: Request, res: Response, next: NextFunction) {
     //@ts-ignore
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     //@ts-ignore
-    req.user = decoded;
+    req.user = { userId: decoded.id, ...decoded };
     next();
   } catch (e) {
-    res.status(401).send("Unauthorized");
+    console.log(e);
+    res.status(401).send("Unauthorized middleware");
   }
 }

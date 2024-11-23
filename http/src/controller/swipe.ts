@@ -31,23 +31,22 @@ const right = async (req: Request, res: Response) => {
       return res.status(400).send("User not found");
     }
 
-    User.findById(userId).then((user) => {
-      if (!user) {
-        return res.status(400).send("User not found");
-      }
-      if (parseFloat(user.walletBalance) < 0.2) {
-        return res.status(400).send("Insufficient balance");
-      }
-      user.walletBalance = (parseFloat(user.walletBalance) - 0.2).toString();
-      user.save();
-      const transaction = new Transaction({
-        userId,
-        amount: "0.2",
-        type: "swipe",
-        receiver: new mongoose.Types.ObjectId(receiver),
-      });
-      transaction.save();
-    })
+    const u = await User.findById(userId);
+    if (!u) {
+      return res.status(400).send("User not found");
+    }
+    if (parseFloat(u.walletBalance) < 0.2) {
+      return res.status(400).send("Insufficient balance");
+    }
+    u.walletBalance = (parseFloat(u.walletBalance) - 0.2).toString();
+    u.save();
+    const transaction = new Transaction({
+      userId,
+      amount: "0.2",
+      type: "swipe",
+      receiver: new mongoose.Types.ObjectId(receiver),
+    });
+    transaction.save();
 
     Graphdb.likeUser(userId, receiver).then(() => {
       res.send("swiped");

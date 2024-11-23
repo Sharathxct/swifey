@@ -4,6 +4,13 @@ import { Connection } from "../models/connection";
 
 const getProfiles = async (req: Request, res: Response) => {
   //@ts-ignore
+  console.log(req.user)
+
+  //@ts-ignore
+  if (!req.user.userId) {
+    return res.status(401).send("Unauthorized");
+  }
+  //@ts-ignore
   const users = await Graphdb.usersWithNoCurrentUser(req.user.userId);
   res.send(users);
 }

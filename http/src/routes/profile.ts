@@ -4,8 +4,6 @@ import { auth } from "../middleware/auth";
 
 const profile = Router();
 
-profile.put("/",);
-
 //@ts-ignore
 profile.get("/profiles", auth, getProfiles);
 
