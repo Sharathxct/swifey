@@ -14,11 +14,15 @@ import { TouchableOpacity } from 'react-native';
 
 export default function HomeScreen() {
   const [balance, setBalance] = useState(0);
+  const [token, setToken] = useState('');
   console.log("HomeScreen");
   useEffect(() => {
     const checkSession = async () => {
       const token = await AsyncStorage.getItem('auth_token');
       console.log(token)
+      if (token) {
+        setToken(token)
+      }
       if (!token) {
         router.push('/(auth)/sign-in');
       }
@@ -41,6 +45,14 @@ export default function HomeScreen() {
     checkBalance();
   }, []);
 
+  if (!token) {
+    return (
+      <View className='flex w-full'>
+        <Text className='text-3xl text-center tracking-widest ml-4'>Login to see your profile</Text>
+      </View>
+    )
+  }
+
   return (
     <SafeAreaView>
       <View className='flex w-full'>
@@ -58,7 +70,7 @@ export default function HomeScreen() {
           </View>
         </View>
         <View className='h-full mt-4 pt-4 px-2' >
-          <ProfileCard />
+          <ProfileCard token={token} />
         </View>
       </View>
     </SafeAreaView >

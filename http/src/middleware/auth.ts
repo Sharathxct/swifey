@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 export function auth(req: Request, res: Response, next: NextFunction) {
+  console.log("auth middleware")
   const token = req.headers.authorization;
   if (!token) {
     return res.status(401).send("Unauthorized");

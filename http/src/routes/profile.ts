@@ -8,7 +8,7 @@ const profile = Router();
 profile.get("/profiles", auth, getProfiles);
 
 //@ts-ignore
-profile.get("/profile", auth, getProfile);
+profile.get("/", auth, getProfile);
 
 //@ts-ignore
 profile.get("/MyConnections", auth, getMyConnections);

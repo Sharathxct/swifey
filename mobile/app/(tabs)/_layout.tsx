@@ -47,9 +47,9 @@ const TabLayout = () => {
         />
 
         <Tabs.Screen
-          name="profile"
+          name="Connections"
           options={{
-            title: "Profile",
+            title: "Connections",
             headerShown: false,
             tabBarIcon: ({ color, focused }) => (
               <View className="flex items-center justify-center gap-2 w-12">

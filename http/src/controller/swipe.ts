@@ -7,19 +7,10 @@ import mongoose from "mongoose";
 
 //TODO: reduce the number of network calls
 const right = async (req: Request, res: Response) => {
+  console.log("right")
   //@ts-ignore
   const { userId } = req.user;
   const { receiver } = req.body;
-
-  // first check if the user has enough balance and deduct sol 0.2
-  // make a connection in graphdb
-  // add the connection in relational db
-  // send a notification to the receiver
-
-  // 5 network calls in right swipe verification of receiver, deduction of sol, update transaction, 
-  // graphdb connection, relational db connection
-  // Ideally check if we can manage connection in graphdb and delete the connections in relational db
-  // And make a db transaction to deduct sol and update the transaction
   if (!receiver) {
     return res.status(400).send("bad request");
   }
