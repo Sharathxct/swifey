@@ -35,6 +35,7 @@ export default function SignInScreen() {
       });
 
       const { token } = response.data;
+      console.log(token)
       await AsyncStorage.setItem('auth_token', token);
 
       router.push('/(tabs)/home');

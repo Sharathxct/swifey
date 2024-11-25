@@ -25,8 +25,18 @@ const getMyConnections = async (req: Request, res: Response) => {
   res.send(connections);
 }
 
+const getProfile = async (req: Request, res: Response) => {
+  console.log("req received get profile")
+  //@ts-ignore
+  const { userId } = req.user;
+  const user = await Graphdb.userWithNoCurrentUser(userId);
+  console.log("user", user)
+  res.send(user);
+}
+
 
 export {
   getProfiles,
-  getMyConnections
+  getMyConnections,
+  getProfile
 }

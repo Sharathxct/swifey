@@ -17,14 +17,10 @@ class Graphdb {
     return this.driver;
   }
 
-  static async creatUser(username: string, id: string, dob: Date, gender: string, college: string, company: string) {
-    try {
-      const driver = Graphdb.getDriver();
-      const g = await driver.executeQuery(`CREATE (u: User { mongoId: $id, username: $username, dob: $dob, gender: $gender, college: $college, company: $company })`, { id, username, dob, gender, college, company });
-      return g;
-    } catch (err) {
-      console.log(err)
-    }
+  static async creatUser(username: string, id: string, doby: number, gender: string, college: string, company: string) {
+    const driver = Graphdb.getDriver();
+    const g = await driver.executeQuery(`CREATE (u: User { mongoId: $id, username: $username, doby: $doby, gender: $gender, college: $college, company: $company })`, { id, username, doby, gender, college, company });
+    return g;
   }
 
   static async usersWithNoCurrentUser(id: string) {
@@ -32,6 +28,13 @@ class Graphdb {
     const result = await driver.executeQuery(`MATCH (cu: User { mongoId: $id }) MATCH (ou: User) WHERE NOT (cu)-[:LIKE|:DISLIKE] -> (ou) AND cu <> ou RETURN ou`, { id });
     const users = result.records.map((record) => record.get("ou").properties);
     return users;
+  }
+
+  static async userWithNoCurrentUser(id: string) {
+    const driver = Graphdb.getDriver();
+    const result = await driver.executeQuery(`MATCH (cu: User { mongoId: $id }) MATCH (ou: User) WHERE NOT (cu)-[:LIKE|:DISLIKE] -> (ou) AND cu <> ou RETURN ou LIMIT 1`, { id });
+    const user = result.records.map((record) => record.get("ou").properties);
+    return user;
   }
 
   static async likeUser(id: string, userId: string) {

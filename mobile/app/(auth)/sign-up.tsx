@@ -9,7 +9,6 @@ import { baseUrl } from '~/lib/constant';
 import { Link } from 'expo-router';
 
 export default function SignUpScreen() {
-  // Define state for form inputs
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,15 +18,13 @@ export default function SignUpScreen() {
   const [company, setCompany] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Function to handle the sign-up API request
   const handleSignUp = async () => {
     setIsLoading(true);
 
-    // Format the DOB from day, month, year to the required format
     const formattedDob = `${dob.day}-${dob.month}-${dob.year}`;
 
     try {
-      console.log("req data", username, email, password, dob, gender, college, company)
+      console.log("req data, url", username, email, password, dob, gender, college, company, baseUrl, '/api/auth/signup')
       const response = await axios.post(baseUrl + '/api/auth/signup', {
         username,
         email,
@@ -43,7 +40,7 @@ export default function SignUpScreen() {
       await AsyncStorage.setItem('auth_token', token);
       console.log(token)
 
-      router.push('/(tabs)/home');
+      router.push('/(auth)/verify');
     } catch (error) {
       console.error('Sign-up error', error);
       Alert.alert('Error', 'There was an issue signing you up. Please try again.');
@@ -151,52 +148,3 @@ export default function SignUpScreen() {
   );
 }
 
-const styles = {
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  formContainer: {
-    padding: 16,
-    flex: 1,
-    justifyContent: 'center',
-  },
-  header: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-
-  formFields: {
-    marginBottom: 20,
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingLeft: 10,
-    marginBottom: 10,
-  },
-  dobContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  dobInput: {
-    flex: 1,
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingLeft: 10,
-    marginRight: 5,
-  },
-  loadingIndicator: {
-    marginTop: 10,
-  },
-  signInLink: {
-    textAlign: 'center',
-    marginTop: 20,
-  },
-};

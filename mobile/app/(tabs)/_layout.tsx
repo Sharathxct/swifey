@@ -62,7 +62,7 @@ const TabLayout = () => {
         <Tabs.Screen
           name="chat"
           options={{
-            title: "Chat",
+            title: "Conv",
             headerShown: false,
             tabBarIcon: ({ color, focused }) => (
               <View className="flex items-center justify-center gap-2 w-12">

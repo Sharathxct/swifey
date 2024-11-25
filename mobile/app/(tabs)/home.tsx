@@ -3,7 +3,6 @@ import { Text } from '~/components/ui/text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Wallet } from 'lucide-react-native';
 import ProfileCard from '~/components/profile';
-import { Button } from '~/components/ui/button';
 import { LogOut } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
@@ -11,6 +10,7 @@ import { useEffect } from 'react';
 import { baseUrl } from '~/lib/constant';
 import axios from 'axios';
 import { useState } from 'react';
+import { TouchableOpacity } from 'react-native';
 
 export default function HomeScreen() {
   const [balance, setBalance] = useState(0);
@@ -45,12 +45,12 @@ export default function HomeScreen() {
     <SafeAreaView>
       <View className='flex w-full'>
         <View className='flex-row w-full items-center justify-between px-4'>
-          <Button onPress={async () => {
+          <TouchableOpacity onPress={async () => {
             await AsyncStorage.removeItem('auth_token');
             router.push('/(auth)/sign-in');
           }}>
             <LogOut />
-          </Button>
+          </TouchableOpacity>
           <Text className='text-3xl text-center tracking-widest ml-4'>Swifey</Text>
           <View className='flex-row  items-center justify-center gap-2'>
             <Wallet className='text-sm' size={14} />

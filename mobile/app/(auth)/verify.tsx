@@ -5,7 +5,7 @@ import { ReclaimProofRequest } from '@reclaimprotocol/reactnative-sdk';
 
 const APP_ID = '0xaF7417b895d0695b2f6fb25c59dB2Fc6fA62bA3f';
 const APP_SECRET = '0x718059ef841a8b5138a44e132c9656643d05d2149c7e6acbdab00490b338cae9';
-const PROVIDER_ID = '5e1302ca-a3dd-4ef8-bc25-24fcc97dc800';
+const PROVIDER_ID = 'a9f1063c-06b7-476a-8410-9ff6e427e637';
 
 async function initializeReclaim() {
   const reclaimProofRequest = await ReclaimProofRequest.init(APP_ID, APP_SECRET, PROVIDER_ID);

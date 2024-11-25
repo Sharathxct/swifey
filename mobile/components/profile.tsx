@@ -1,179 +1,63 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, ImageBackground, Dimensions, ActivityIndicator } from 'react-native';
-import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  runOnJS,
-} from 'react-native-reanimated';
+import { View, Image } from 'react-native';
 import { Text } from '~/components/ui/text';
-import axios from 'axios';
-import { baseUrl } from '~/lib/constant';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { router } from 'expo-router';
+import { ScrollView } from 'react-native';
+import { Heart, XIcon } from 'lucide-react-native';
+import { useState, useEffect } from 'react';
+import { TouchableOpacity } from 'react-native';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
-
-
-function ProfileCard({
-  name = "Emma Johnson",
-  age = 24,
-  bio = "Software engineer | Travel enthusiast | Dog lover",
-  imageUri,
-  onSwipeLeft,
-  onSwipeRight
-}: any) {
-  const translateX = useSharedValue(0);
-  const rotateZ = useSharedValue(0);
-
-  const gestureHandler = useRef();
-
-  const panGestureEvent = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateX: translateX.value },
-        { rotateZ: `${rotateZ.value}deg` }
-      ]
-    };
+export default function ProfileCard() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
+  const [profile, setProfile] = useState({
+    name: 'Sharath Chandra',
+    age: 25,
+    gender: 'Male',
+    college: 'IIIT',
+    company: 'Swifey',
+    dob: '20/12/1995',
+    email: 'sharathchandra@gmail.com',
+    phone: '+91 987654321',
+    uri: 'https://reactnative.dev/img/tiny_logo.png',
   });
 
-  const handleGestureStateChange = (event: any) => {
-    if (event.nativeEvent.state === State.END) {
-      if (translateX.value > SCREEN_WIDTH / 3) {
-        translateX.value = withSpring(SCREEN_WIDTH, { damping: 20, stiffness: 150 }, () => {
-          runOnJS(onSwipeRight)();
-        });
-        rotateZ.value = withSpring(15, { damping: 20, stiffness: 150 });
-      } else if (translateX.value < -SCREEN_WIDTH / 3) {
-        translateX.value = withSpring(-SCREEN_WIDTH, { damping: 20, stiffness: 150 }, () => {
-          runOnJS(onSwipeLeft)();
-        });
-        rotateZ.value = withSpring(-15, { damping: 20, stiffness: 150 });
-      } else {
-        translateX.value = withSpring(0, { damping: 20, stiffness: 150 });
-        rotateZ.value = withSpring(0, { damping: 20, stiffness: 150 });
-      }
-    }
-  };
-
-  return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <PanGestureHandler
-        ref={gestureHandler}
-        onGestureEvent={(event) => {
-          translateX.value = event.nativeEvent.translationX;
-          rotateZ.value = event.nativeEvent.translationX / 20;
-        }}
-        onHandlerStateChange={handleGestureStateChange}
-      >
-        <Animated.View style={[
-          {
-            width: '100%',
-            height: '85%',
-            position: 'absolute'
-          },
-          panGestureEvent
-        ]}>
-          <ImageBackground
-            source={imageUri}
-            className='flex-1 justify-end'
-            style={{ width: '100%', height: '100%' }}
-          >
-            <View className='bg-black/50 p-4'>
-              <Text className='text-white text-2xl font-bold'>
-                {name}, {age}
-              </Text>
-              <Text className='text-white text-base mt-2'>
-                {bio}
-              </Text>
-            </View>
-          </ImageBackground>
-        </Animated.View>
-      </PanGestureHandler>
-    </GestureHandlerRootView>
-  );
-}
-
-function SwipeableProfileStack() {
-  const [profiles, setProfiles] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState('');
-
-  const getToken = async () => {
-    const token = await AsyncStorage.getItem('auth_token');
-    if (!token) {
-      return router.push('/(auth)/sign-in');
-    }
-    setToken(token);
+  async function handleLeftIconPress() {
+    console.log("left icon pressed")
+    updateProfile()
   }
 
-  const fetchNewBatch = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`${baseUrl}/api/profile/profiles`, {
-        headers: {
-          Authorization: `${token}`
-        }
-      });
-      if (response.data && response.data.length > 0) {
-        setProfiles(response.data);
-      } else {
-        console.log("No more profiles");
-      }
-    } catch (error) {
-      console.error("Error fetching profiles:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  async function handleRightIconPress() {
+    console.log("right icon pressed")
+    updateProfile()
+  }
 
-  useEffect(() => {
-    getToken();
-    fetchNewBatch();
-  }, []);
+  function updateProfile() {
 
-  const handleSwipeRight = () => {
-    console.log("right swipe");
-    setProfiles((prevProfiles) => {
-      const [_swipedProfile, ...rest] = prevProfiles;
-      return rest;
-    });
-    if (profiles.length <= 1) {
-      fetchNewBatch();
-    }
-  };
-
-  const handleSwipeLeft = () => {
-    console.log("left swipe");
-    setProfiles((prevProfiles) => {
-      const [_swipedProfile, ...rest] = prevProfiles;
-      return rest;
-    });
-    if (profiles.length <= 1) {
-      fetchNewBatch();
-    }
-  };
+  }
 
   return (
-    <View style={{ flex: 1 }}>
-      {loading ? (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <ActivityIndicator size="large" color="#0000ff" />
+    <ScrollView >
+      <View className='flex-col items-center justify-between w-full h-full  '>
+        <View className='flex-col border-2 h-full items-center justify-center'>
+          <Image
+            source={
+              { uri: profile.uri }
+            }
+            className='w-[200px] h-[200px] mt-4'
+          />
+          <Text className='text-center text-2xl font-bold mt-4'>Sharath Chandra</Text>
+
+          <View className='flex-row gap-4 mt-4  justify-around '>
+            <TouchableOpacity onPress={handleLeftIconPress}>
+              <XIcon className='text-xl' />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={handleRightIconPress}>
+              <Heart className='text-xl' />
+            </TouchableOpacity>
+          </View>
         </View>
-      ) : profiles.length > 0 ? (
-        <ProfileCard
-          key={profiles[0].id}
-          {...profiles[0]}
-          onSwipeRight={handleSwipeRight}
-          onSwipeLeft={handleSwipeLeft}
-        />
-      ) : (
-        <Text>No more profiles</Text>
-      )}
-    </View>
+      </View>
+    </ScrollView>
   );
 }
-
-export default SwipeableProfileStack;
 
