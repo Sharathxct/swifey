@@ -5,33 +5,74 @@ import { ScrollView } from 'react-native';
 import { useState } from 'react';
 import { Avatar, AvatarImage } from '~/components/ui/avatar';
 import { Link } from 'expo-router';
+import { baseUrl } from '~/lib/constant';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect } from 'react';
 
 export default function ChatScreen() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState();
-  const [profiles, setProfiles] = useState([
-    {
-      name: 'Sharath Chandra',
-      age: 25,
-      gender: 'Male',
-      college: 'IIIT',
-      company: 'Swifey',
-      dob: '20/12/1995',
-      email: 'sharathchandra@gmail.com',
-      phone: '+91 987654321',
-      uri: 'https://reactnative.dev/img/tiny_logo.png',
-    }, {
-      name: 'Kirat ',
-      age: 25,
-      gender: 'Male',
-      college: 'IIIT',
-      company: 'Swifey',
-      dob: '20/12/1995',
-      email: 'sharathchandra@gmail.com',
-      phone: '+91 987654321',
-      uri: 'https://reactnative.dev/img/tiny_logo.png',
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+  const [token, setToken] = useState<string>('');
+  const [profiles, setProfiles] = useState<any[]>([]);
+
+  async function getChats() {
+    setIsLoading(true);
+    try {
+      const res = await axios.get(baseUrl + '/api/profile/MyChats', {
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+      console.log("response of connections", res.data);
+      if (res.data.length > 0) {
+        setProfiles(res.data);
+      } else {
+        setError(true);
+      }
+    } catch (error) {
+      console.error("Error fetching profiles", error);
+      setError(true);
     }
-  ])
+    setIsLoading(false);
+  }
+
+  async function getToken() {
+    const token = await AsyncStorage.getItem('auth_token');
+    if (token) {
+      setToken(token);
+    } else {
+      setError(true);
+    }
+  }
+
+  useEffect(() => {
+    async function setup() {
+      await getToken();
+      if (token) {
+        await getChats();
+      }
+    }
+
+    setup();
+  }, [token]);
+
+  if (isLoading) {
+    return (
+      <View className='flex-col items-center justify-center w-full h-full'>
+        <Text className='text-center text-2xl font-bold mt-4'>Loading...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View className='flex-col items-center justify-center w-full h-full'>
+        <Text className='text-center text-2xl font-bold mt-4'>No requests found</Text>
+      </View>
+    );
+  }
+
 
 
   return (
@@ -42,22 +83,22 @@ export default function ChatScreen() {
         </View>
         <View className='flex-col w-full items-center  py-2 mt-4'>
           {profiles.map((profile, index) => (
-            <Link href={`/chat/${index}`} key={index}>
-              <View className='flex-row gap-2 w-full items-center border-b border-gray-200  h-[60px] py-4' key={index} >
+            < Link href={`/chat/${profile._id}`} key={index}>
+              <View className='flex-row gap-2 w-full items-center border-b border-gray-200  h-[60px] py-4 px-4' key={index} >
                 <Avatar className='h-[40px] w-[40px]' alt='pp'  >
                   <AvatarImage
                     source={
-                      { uri: profile.uri }
+                      { uri: profile.imageUrl }
                     }
                   />
                 </Avatar>
-                <Text className='text-center text-xl font-bold'>{profile.name}</Text>
+                <Text className='text-center text-xl ml-4 font-bold'>{profile.username}</Text>
               </View>
             </Link>
           ))}
         </View>
       </SafeAreaView>
-    </ScrollView>
+    </ScrollView >
   );
 }
 

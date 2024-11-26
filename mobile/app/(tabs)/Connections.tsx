@@ -27,18 +27,24 @@ export default function Connections() {
         }
       });
     console.log("response", res)
+    await getProfiles()
   }
 
   async function handleReject(id: string) {
     console.log("rejected", id);
-    const res = await axios.post(baseUrl + '/api/swipe/reject',
-      { conId: id },
-      {
-        headers: {
-          Authorization: `${token}`,
-        }
-      });
-    console.log("response", res)
+    try {
+      const res = await axios.post(baseUrl + '/api/swipe/reject',
+        { conId: id },
+        {
+          headers: {
+            Authorization: `${token}`,
+          }
+        });
+      console.log("response", res)
+    } catch (e: any) {
+      console.log(e)
+    }
+    await getProfiles()
   }
 
   async function getProfiles() {

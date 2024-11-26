@@ -59,6 +59,7 @@ const accept = async (req: Request, res: Response) => {
   //@ts-ignore
   const { userId } = req.user;
   const { conId } = req.body;
+  console.log("userId", userId)
   console.log("conId", conId)
   try {
     const con = await Connection.findById(conId);
@@ -68,7 +69,7 @@ const accept = async (req: Request, res: Response) => {
       return res.status(400).send("Connection not found");
     }
 
-    if (con.to !== userId) {
+    if (con.to.toString() !== userId) {
       console.log("invalid connection")
       return res.status(400).send("Invalid connection");
     }
@@ -93,19 +94,23 @@ const accept = async (req: Request, res: Response) => {
 }
 
 const reject = async (req: Request, res: Response) => {
+  console.log("in reject")
   //@ts-ignore
   const { userId } = req.user;
   const { conId } = req.body;
   try {
     const con = await Connection.findById(conId);
     if (!con) {
+      console.log("con not found")
       return res.status(400).send("Connection not found");
     }
-    if (con.to !== userId) {
+    if (con.to.toString() !== userId) {
+      console.log("invalid connection")
       return res.status(400).send("Invalid connection");
     }
     con.status = "rejected";
     con.save();
+    console.log("con updated")
     const to = await User.findById(userId);
     if (!to) {
       return res.status(400).send("User not found");

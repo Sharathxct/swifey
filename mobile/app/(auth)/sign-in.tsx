@@ -40,8 +40,7 @@ export default function SignInScreen() {
 
       router.push('/(tabs)/home');
     } catch (error) {
-      console.error('Sign-in error', error);
-      Alert.alert('Error', 'There was an issue signing you in. Please try again.');
+      Alert.alert('Incorrect Credentials', 'There was an issue signing you in. Please try again.');
     } finally {
       setIsLoading(false);
     }

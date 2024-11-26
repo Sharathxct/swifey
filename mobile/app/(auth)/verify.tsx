@@ -3,80 +3,69 @@ import { View, Button, Linking } from 'react-native';
 import { Text } from '~/components/ui/text';
 import { ReclaimProofRequest } from '@reclaimprotocol/reactnative-sdk';
 
-const APP_ID = '0xaF7417b895d0695b2f6fb25c59dB2Fc6fA62bA3f';
-const APP_SECRET = '0x718059ef841a8b5138a44e132c9656643d05d2149c7e6acbdab00490b338cae9';
-const PROVIDER_ID = 'a9f1063c-06b7-476a-8410-9ff6e427e637';
-
-async function initializeReclaim() {
-  const reclaimProofRequest = await ReclaimProofRequest.init(APP_ID, APP_SECRET, PROVIDER_ID);
-  return reclaimProofRequest;
-}
-
-async function generateRequestUrl(reclaimProofRequest: any) {
-  const requestUrl = await reclaimProofRequest.getRequestUrl();
-  console.log('Request URL:', requestUrl);
-  return requestUrl;
-}
-
-async function startVerificationSession(reclaimProofRequest: any, onSuccess: any, onFailure: any) {
-  await reclaimProofRequest.startSession({
-    onSuccess: onSuccess,
-    onFailure: onFailure,
-  });
-}
-function ReclaimDemo() {
-  const [requestUrl, setRequestUrl] = useState('');
+const ReclaimComponent = () => {
   const [status, setStatus] = useState('');
+  const [requestUri, setRequestUrl] = useState('');
 
-  useEffect(() => {
-    async function setup() {
-      try {
-        const reclaimProofRequest = await initializeReclaim();
-        const url = await generateRequestUrl(reclaimProofRequest);
-        setRequestUrl(url);
-        setStatus('Ready to start verification');
+  const initializeReclaim = async () => {
+    try {
+      setStatus('Initializing...');
 
-        await startVerificationSession(
-          reclaimProofRequest,
-          (proofs: any) => {
-            if (proofs) {
-              if (typeof proofs === 'string') {
-                console.log('SDK Message:', proofs);
-              } else if (typeof proofs !== 'string') {
-                console.log('Proof received:', proofs?.claimData.context);
-              }
-              setStatus('Proof received!');
+      // Fetch the configuration from your backend
+      const response = await fetch('http://localhost:3000/api/reclaim/generate-config');
+      const { reclaimProofRequestConfig } = await response.json();
+
+      // Reconstruct the ReclaimProofRequest object
+      const reclaimProofRequest = await ReclaimProofRequest.fromJsonString(reclaimProofRequestConfig);
+
+      // Generate request URL
+      const requestUrl = await reclaimProofRequest.getRequestUrl();
+      setRequestUrl(requestUrl)
+
+      // Start the session for better UX
+      await reclaimProofRequest.startSession({
+        onSuccess: (proofs) => {
+          if (proofs) {
+            if (typeof proofs === 'string') {
+              // When using a custom callback url, the proof is returned to the callback url and we get a message instead of a proof
+              console.log('SDK Message:', proofs);
+            } else if (typeof proofs !== 'string') {
+              // When using the default callback url, we get a proof object in the response
+              console.log('Proof received:', proofs?.claimData.context);
             }
-          },
-          (error: any) => {
-            console.error('Verification failed', error);
-            setStatus(`Error: ${error.message}`);
+            setStatus('Proof received!');
           }
-        );
-      } catch (error) {
-        console.error('Setup failed', error);
-        //@ts-ignore
-        setStatus(`Setup failed: ${error.message} `);
-      }
-    }
+          // Handle successful verification (e.g., update UI, send to backend)
+        },
+        onError: (error) => {
+          console.error('Verification failed', error);
+          setStatus('Verification failed. Please try again.');
+          // Handle verification failure (e.g., show error message)
+        },
+      });
 
-    setup();
-  }, []);
+      console.log('Request URL:', requestUrl);
+      setStatus('Reclaim process started. Please follow the instructions.');
+    } catch (error) {
+      console.error('Error initializing Reclaim:', error);
+      setStatus('Error initializing Reclaim. Please try again.');
+      // Handle initialization error (e.g., show error message)
+    }
+  };
 
   const openRequestUrl = () => {
-    if (requestUrl) {
-      Linking.openURL(requestUrl);
+    if (requestUri) {
+      Linking.openURL(requestUri);
     }
   };
 
   return (
-    <View style={{ padding: 20 }}>
-      <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Reclaim Demo</Text>
-      <Text>Status: {status}</Text>
-      {requestUrl && <Button title="Start Verification" onPress={openRequestUrl} />}
+    <View>
+      <Button title="Start Reclaim Process" onPress={initializeReclaim} />
+      <Text>{status}</Text>
+      {requestUri && <Button title='State Verification' onPress={openRequestUrl} />}
     </View>
   );
-}
+};
 
-export default ReclaimDemo;
-//const PROVIDER_ID = 'a9f1063c-06b7-476a-8410-9ff6e427e637';
+export default ReclaimComponent;

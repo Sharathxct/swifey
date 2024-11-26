@@ -5,6 +5,7 @@ import { Input } from '~/components/ui/input';
 import { useState, useRef, useEffect } from 'react';
 import { Send } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
+import { useGlobalSearchParams, useLocalSearchParams } from 'expo-router';
 
 interface Message {
   from: 'me' | 'you';
@@ -19,6 +20,7 @@ interface MessageProps {
 
 function MessageComp({ message }: MessageProps) {
   const isMe = message.from === 'me';
+
 
   return (
     <View className={`flex-row ${isMe ? 'justify-end' : 'justify-start'} my-1 px-4`}>
@@ -42,7 +44,10 @@ export default function ChatScreen() {
   const [error, setError] = useState<string | undefined>();
   const [inputMessage, setInputMessage] = useState('');
   const scrollViewRef = useRef<ScrollView>(null);
-
+  const { id } = useLocalSearchParams();
+  const { gId } = useGlobalSearchParams();
+  console.log("id", id)
+  console.log("gId", gId)
   const [messages, setMessages] = useState<Message[]>([
     {
       from: 'me',
@@ -60,6 +65,12 @@ export default function ChatScreen() {
       from: 'me',
       to: 'you',
       content: 'Im doing great, thanks for asking!',
+      type: 'text',
+    },
+    {
+      from: 'you',
+      to: 'me',
+      content: id.toString(),
       type: 'text',
     }
   ]);
