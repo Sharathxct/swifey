@@ -15,7 +15,24 @@ import { TouchableOpacity } from 'react-native';
 export default function HomeScreen() {
   const [balance, setBalance] = useState(0);
   const [token, setToken] = useState('');
+  const [update, setUpdate] = useState(false);
   console.log("HomeScreen");
+
+  const checkBalance = async () => {
+    const token = await AsyncStorage.getItem('auth_token');
+    console.log(token)
+    if (!token) {
+      router.push('/(auth)/sign-in');
+    }
+    const response = await axios.get(baseUrl + '/api/sol/balance', {
+      headers: {
+        Authorization: `${token}`,
+      },
+    });
+    console.log(response.data);
+    setBalance(response.data);
+  };
+
   useEffect(() => {
     const checkSession = async () => {
       const token = await AsyncStorage.getItem('auth_token');
@@ -28,22 +45,14 @@ export default function HomeScreen() {
       }
     };
     checkSession();
-    const checkBalance = async () => {
-      const token = await AsyncStorage.getItem('auth_token');
-      console.log(token)
-      if (!token) {
-        router.push('/(auth)/sign-in');
-      }
-      const response = await axios.get(baseUrl + '/api/sol/balance', {
-        headers: {
-          Authorization: `${token}`,
-        },
-      });
-      console.log(response.data);
-      setBalance(response.data);
-    };
     checkBalance();
   }, []);
+
+  useEffect(() => {
+    if (update) {
+      checkBalance()
+    }
+  }, [update])
 
   if (!token) {
     return (
@@ -70,7 +79,7 @@ export default function HomeScreen() {
           </View>
         </View>
         <View className='h-full mt-4 pt-4 px-2' >
-          <ProfileCard token={token} />
+          <ProfileCard token={token} setUpdate={setUpdate} />
         </View>
       </View>
     </SafeAreaView >

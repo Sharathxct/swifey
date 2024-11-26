@@ -7,7 +7,7 @@ import { TouchableOpacity } from 'react-native';
 import { baseUrl } from '~/lib/constant';
 import axios from 'axios';
 
-export default function ProfileCard({ token }: any) {
+export default function ProfileCard({ token, setUpdate }: any) {
   const [error, setError] = useState<boolean>(false);
   const [noBalance, setNoBalance] = useState(false);
   const [profile, setProfile] = useState({
@@ -48,6 +48,8 @@ export default function ProfileCard({ token }: any) {
           }
         });
       await updateProfile()
+      //@ts-ignore
+      setUpdate(u => !u)
     } catch (e: any) {
       if (e.response.status === 400 && e.response.data === "Insufficient balance") {
         setNoBalance(true)
