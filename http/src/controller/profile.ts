@@ -4,9 +4,6 @@ import { Connection } from "../models/connection";
 
 const getProfiles = async (req: Request, res: Response) => {
   //@ts-ignore
-  console.log(req.user)
-
-  //@ts-ignore
   if (!req.user.userId) {
     return res.status(401).send("Unauthorized");
   }
@@ -15,18 +12,34 @@ const getProfiles = async (req: Request, res: Response) => {
   res.send(users);
 }
 
-const getMyConnections = async (req: Request, res: Response) => {
+const getMyConnectionsReq = async (req: Request, res: Response) => {
   //@ts-ignore
   const { userId } = req.user;
-  const connections = await Connection.find({ to: userId });
-  if (!connections) {
+  const connections = await Connection.find({ to: userId, status: "pending" }).populate({ path: "from", select: 'username email imageUrl' }).lean();
+  const connectionRequests = connections.map(conn => {
+    return {
+      ...conn.from,
+      connectionId: conn._id
+    }
+  });
+  if (!connectionRequests) {
     return res.status(200).send([]);
   }
-  res.send(connections);
+  res.send(connectionRequests);
+}
+
+const getMyChats = async (req: Request, res: Response) => {
+  //@ts-ignore
+  const { userId } = req.user;
+  const chats = await Connection.find({ from: userId, status: "accepted" }).populate({ path: "to", select: 'username email imageUrl' }).lean();
+  const connectionRequests = chats.map(conn => conn.to);
+  if (!connectionRequests) {
+    return res.status(200).send([]);
+  }
+  res.send(connectionRequests);
 }
 
 const getProfile = async (req: Request, res: Response) => {
-  console.log("req received get profile")
   //@ts-ignore
   const { userId } = req.user;
   const user = await Graphdb.userWithNoCurrentUser(userId);
@@ -37,6 +50,7 @@ const getProfile = async (req: Request, res: Response) => {
 
 export {
   getProfiles,
-  getMyConnections,
-  getProfile
+  getMyConnectionsReq,
+  getProfile,
+  getMyChats
 }

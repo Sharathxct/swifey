@@ -8,8 +8,8 @@ import { baseUrl } from '~/lib/constant';
 import axios from 'axios';
 
 export default function ProfileCard({ token }: any) {
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<boolean>(false);
+  const [noBalance, setNoBalance] = useState(false);
   const [profile, setProfile] = useState({
     name: 'Sharath Chandra',
     dob: 25,
@@ -20,7 +20,7 @@ export default function ProfileCard({ token }: any) {
     username: 'sharathchandra',
     email: 'sharathchandra@gmail.com',
     phone: '+91 987654321',
-    uri: 'https://reactnative.dev/img/tiny_logo.png',
+    imageUrl: 'https://reactnative.dev/img/tiny_logo.png',
   });
 
   async function handleLeftIconPress() {
@@ -32,26 +32,28 @@ export default function ProfileCard({ token }: any) {
           Authorization: `${token}`,
         }
       });
-    console.log(res.data)
+    console.log(res)
     await updateProfile()
   }
 
   async function handleRightIconPress() {
     console.log("right icon pressed")
-    const res = await axios.post(baseUrl + '/api/swipe/right',
-      {
-        receiver: profile.mongoId,
-      },
-      {
-        headers: {
-          Authorization: `${token}`,
-        }
-      });
-    console.log(res.data)
-    await updateProfile()
+    console.log("token", token)
+    try {
+      await axios.post(baseUrl + '/api/swipe/right',
+        { receiver: profile.mongoId },
+        {
+          headers: {
+            Authorization: `${token}`,
+          }
+        });
+      await updateProfile()
+    } catch (e: any) {
+      if (e.response.status === 400 && e.response.data === "Insufficient balance") {
+        setNoBalance(true)
+      }
+    }
   }
-
-  const fallbackUri = 'https://reactnative.dev/img/tiny_logo.png';
 
   async function updateProfile() {
     console.log("updating profile")
@@ -73,6 +75,13 @@ export default function ProfileCard({ token }: any) {
     updateProfile()
   }, [])
 
+  useEffect(() => {
+    if (noBalance) {
+      alert("Insufficient balance")
+    }
+    setNoBalance(false)
+  }, [noBalance])
+
   if (error) {
     return (
       <View className='flex-col items-center justify-center w-full h-full'>
@@ -84,15 +93,15 @@ export default function ProfileCard({ token }: any) {
     return (
       < ScrollView >
         <View className='flex-col items-center justify-between w-full h-full  '>
-          <View className='flex-col border-2 h-full items-center justify-center'>
+          <View className='flex-col  h-full items-center justify-center'>
             <Image
               source={
-                { uri: fallbackUri }
+                { uri: profile.imageUrl }
               }
-              className='w-[200px] h-[200px] mt-4'
+              className='w-[80vw] h-[65vh] mt-4'
             />
-            <Text className='text-center text-2xl font-bold mt-4'>{profile.username}</Text>
-            <View className='flex-row gap-4 mt-4  justify-around '>
+            <Text className=' text-2xl font-bold mt-4'>{profile.username}</Text>
+            <View className='flex-row gap-4 mt-4 w-full px-4 justify-between '>
               <TouchableOpacity onPress={handleLeftIconPress}>
                 <XIcon className='text-xl' />
               </TouchableOpacity>
@@ -105,6 +114,5 @@ export default function ProfileCard({ token }: any) {
       </ScrollView >
     );
   }
-
 }
 

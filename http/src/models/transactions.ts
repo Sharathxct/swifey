@@ -15,9 +15,8 @@ const transactionSchema = new mongoose.Schema({
     enum: ["deposit", "withdraw", "swipe"],
     required: true,
   },
-  receiver: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+  add: {
+    type: Boolean,
     required: false,
   },
 

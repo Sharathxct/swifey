@@ -35,9 +35,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: 0,
   },
-
-  connections: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", }],
-
+  imageUrl: {
+    type: String,
+    default: "",
+  },
 });
 
 userSchema.pre("save", async function(next) {

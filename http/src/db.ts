@@ -17,9 +17,9 @@ class Graphdb {
     return this.driver;
   }
 
-  static async creatUser(username: string, id: string, doby: number, gender: string, college: string, company: string) {
+  static async creatUser(username: string, id: string, doby: number, gender: string, college: string, company: string, imageUrl: string) {
     const driver = Graphdb.getDriver();
-    const g = await driver.executeQuery(`CREATE (u: User { mongoId: $id, username: $username, doby: $doby, gender: $gender, college: $college, company: $company })`, { id, username, doby, gender, college, company });
+    const g = await driver.executeQuery(`CREATE (u: User { mongoId: $id, username: $username, doby: $doby, gender: $gender, college: $college, company: $company, imageUrl: $imageUrl })`, { id, username, doby, gender, college, company, imageUrl });
     return g;
   }
 
