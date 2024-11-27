@@ -9,6 +9,7 @@ const app = express();
 
 app.use(express.json())
 app.get("/", (_req, res) => {
+  console.log("Hello World");
   res.send("Helthy");
 });
 

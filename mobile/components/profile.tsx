@@ -7,26 +7,22 @@ import { TouchableOpacity } from 'react-native';
 import { baseUrl } from '~/lib/constant';
 import axios from 'axios';
 
+interface Profile {
+  username: string;
+  imageUrl: string;
+  mongoId: string;
+  isVerified: boolean;
+}
+
 export default function ProfileCard({ token, setUpdate }: any) {
   const [error, setError] = useState<boolean>(false);
   const [noBalance, setNoBalance] = useState(false);
-  const [profile, setProfile] = useState({
-    name: 'Sharath Chandra',
-    dob: 25,
-    gender: 'Male',
-    college: 'IIIT',
-    mongoId: '62a1f8d0b0f1b2c6b5e5c0a0',
-    company: 'Swifey',
-    username: 'sharathchandra',
-    email: 'sharathchandra@gmail.com',
-    phone: '+91 987654321',
-    imageUrl: 'https://reactnative.dev/img/tiny_logo.png',
-  });
+  const [profile, setProfile] = useState<Profile>();
 
   async function handleLeftIconPress() {
     console.log("left icon pressed")
     const res = await axios.post(baseUrl + '/api/swipe/left',
-      { receiver: profile.mongoId },
+      { receiver: profile?.mongoId },
       {
         headers: {
           Authorization: `${token}`,
@@ -41,7 +37,7 @@ export default function ProfileCard({ token, setUpdate }: any) {
     console.log("token", token)
     try {
       await axios.post(baseUrl + '/api/swipe/right',
-        { receiver: profile.mongoId },
+        { receiver: profile?.mongoId },
         {
           headers: {
             Authorization: `${token}`,
@@ -98,11 +94,11 @@ export default function ProfileCard({ token, setUpdate }: any) {
           <View className='flex-col  h-full items-center justify-center'>
             <Image
               source={
-                { uri: profile.imageUrl }
+                { uri: profile?.imageUrl }
               }
               className='w-[80vw] h-[65vh] mt-4'
             />
-            <Text className=' text-2xl font-bold mt-4'>{profile.username}</Text>
+            <Text className=' text-2xl font-bold mt-4'>{profile?.username}</Text>
             <View className='flex-row gap-4 mt-4 w-full px-4 justify-between '>
               <TouchableOpacity onPress={handleLeftIconPress}>
                 <XIcon className='text-xl' />

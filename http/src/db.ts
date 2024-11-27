@@ -5,6 +5,16 @@ const uri = "neo4j+s://d345d9d6.databases.neo4j.io"
 const username = "neo4j"
 const password = "v8GWo1rbQpBvvFy-yCsV5C4NkIN34rEpaST3Lvb27gI"
 
+const query = `
+ MATCH (cu: User { mongoId: $id })
+  MATCH (ou: User)
+  WHERE NOT (cu)-[:LIKE|:DISLIKE|:ACCEPTED|:REJECTED]->(ou)
+  AND NOT (ou)-[:LIKE|:DISLIKE|:ACCEPTED|:REJECTED]->(cu)
+  AND cu <> ou
+  RETURN ou
+  LIMIT 1
+`
+
 class Graphdb {
   static driver: Driver | null = null;
   static session = null;
@@ -17,9 +27,15 @@ class Graphdb {
     return this.driver;
   }
 
-  static async creatUser(username: string, id: string, doby: number, gender: string, college: string, company: string, imageUrl: string) {
+  static async creatUser(username: string, id: string, doby: number, gender: string, college: string, company: string, imageUrl: string, isVerified: boolean) {
     const driver = Graphdb.getDriver();
-    const g = await driver.executeQuery(`CREATE (u: User { mongoId: $id, username: $username, doby: $doby, gender: $gender, college: $college, company: $company, imageUrl: $imageUrl })`, { id, username, doby, gender, college, company, imageUrl });
+    const g = await driver.executeQuery(`CREATE (u: User { mongoId: $id, username: $username, doby: $doby, gender: $gender, college: $college, company: $company, imageUrl: $imageUrl })`, { id, username, doby, gender, college, company, imageUrl, isVerified });
+    return g;
+  }
+
+  static async verifyUser(id: string) {
+    const driver = Graphdb.getDriver();
+    const g = await driver.executeQuery(`MATCH (u: User { mongoId: $id }) SET u.isVerified = true`, { id });
     return g;
   }
 
@@ -32,8 +48,9 @@ class Graphdb {
 
   static async userWithNoCurrentUser(id: string) {
     const driver = Graphdb.getDriver();
-    const result = await driver.executeQuery(`MATCH (cu: User { mongoId: $id }) MATCH (ou: User) WHERE NOT (cu)-[:LIKE|:DISLIKE] -> (ou) AND cu <> ou RETURN ou LIMIT 1`, { id });
+    const result = await driver.executeQuery(query, { id });
     const user = result.records.map((record) => record.get("ou").properties);
+    console.log("queried user", user)
     return user;
   }
 
@@ -58,3 +75,5 @@ class Graphdb {
 }
 
 export default Graphdb;
+
+

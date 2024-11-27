@@ -17,6 +17,7 @@ export default function Connections() {
   const [profiles, setProfiles] = useState<any[]>([]);
 
   async function handleAccept(id: string) {
+    console.log("clicked")
     console.log("accept", id);
     console.log("token", token)
     const res = await axios.post(baseUrl + '/api/swipe/accept',
@@ -31,6 +32,7 @@ export default function Connections() {
   }
 
   async function handleReject(id: string) {
+    console.log("clicked")
     console.log("rejected", id);
     try {
       const res = await axios.post(baseUrl + '/api/swipe/reject',

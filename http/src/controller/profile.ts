@@ -29,13 +29,40 @@ const getMyConnectionsReq = async (req: Request, res: Response) => {
 }
 
 const getMyChats = async (req: Request, res: Response) => {
+  console.log("getMyChats")
   //@ts-ignore
   const { userId } = req.user;
-  const chats = await Connection.find({ from: userId, status: "accepted" }).populate({ path: "to", select: 'username email imageUrl' }).lean();
-  const connectionRequests = chats.map(conn => conn.to);
+  console.log("userId", userId)
+
+  const chats = await Connection.find({
+    status: 'accepted',
+    $or: [{ from: userId }, { to: userId }]
+  })
+    .populate({
+      path: 'to',
+      select: 'username email imageUrl',
+      match: { from: { $ne: userId } }
+    })
+    .populate({
+      path: 'from',
+      select: 'username email imageUrl',
+      match: { to: { $ne: userId } }
+    })
+    .lean();
+  console.log("chats", chats)
+
+  const connectionRequests = chats.map(conn => {
+    if (conn.to._id.toString() === userId) {
+      return conn.from
+    } else {
+      return conn.to
+    }
+  });
+
   if (!connectionRequests) {
     return res.status(200).send([]);
   }
+  console.log("connectionRequests", connectionRequests)
   res.send(connectionRequests);
 }
 

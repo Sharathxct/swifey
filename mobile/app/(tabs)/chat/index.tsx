@@ -24,7 +24,7 @@ export default function ChatScreen() {
           Authorization: `${token}`,
         },
       });
-      console.log("response of connections", res.data);
+      console.log("response of chats", res.data);
       if (res.data.length > 0) {
         setProfiles(res.data);
       } else {
@@ -68,7 +68,7 @@ export default function ChatScreen() {
   if (error) {
     return (
       <View className='flex-col items-center justify-center w-full h-full'>
-        <Text className='text-center text-2xl font-bold mt-4'>No requests found</Text>
+        <Text className='text-center text-2xl font-bold mt-4'>No chats found</Text>
       </View>
     );
   }

@@ -20,6 +20,17 @@ const right = async (req: Request, res: Response) => {
     if (!rec) {
       return res.status(400).send("User not found");
     }
+    const connection = await Connection.findOne({
+      $or: [
+        { from: userId, to: receiver },
+        { from: receiver, to: userId },
+      ],
+    });
+
+    if (connection) {
+      return res.status(400).send("Connection already exists");
+    }
+
     Graphdb.likeUser(userId, receiver).then(() => {
       console.log("liked")
       res.send("swiped");

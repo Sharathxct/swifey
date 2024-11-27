@@ -27,7 +27,6 @@ export default function Screen() {
     <View className='flex h-full justify-between items-center gap-5 p-6 bg-secondary/30'>
       <View className='w-full my-8 '>
         <Text className='text-5xl mt-10 text-center'>Swifey</Text>
-        <Text className='text-3xl text-center mt-4'>A dating app</Text>
       </View>
       <View className='w-full gap-4'>
         <Button
