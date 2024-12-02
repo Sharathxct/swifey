@@ -80,7 +80,8 @@ export const signup = async (req: Request, res: Response) => {
     gender,
     college,
     company,
-    imageUrl
+    imageUrl,
+    walletBalance: 5
   });
 
   user.save().then(() => {

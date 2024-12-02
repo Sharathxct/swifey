@@ -55,7 +55,6 @@ const proofs = async (req: Request, res: Response) => {
     console.log(e);
     res.status(500).send({ error: "server error" })
   }
-  return res.sendStatus(400)
 }
 
 export {

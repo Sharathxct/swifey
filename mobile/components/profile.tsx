@@ -1,7 +1,7 @@
 import { View, Image } from 'react-native';
 import { Text } from '~/components/ui/text';
 import { ScrollView } from 'react-native';
-import { Heart, XIcon } from 'lucide-react-native';
+import { BadgeCheck, Heart, XIcon } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 import { baseUrl } from '~/lib/constant';
@@ -96,9 +96,13 @@ export default function ProfileCard({ token, setUpdate }: any) {
               source={
                 { uri: profile?.imageUrl }
               }
-              className='w-[80vw] h-[65vh] mt-4'
+              className='w-[60vw] h-[65vh] mt-4'
             />
-            <Text className=' text-2xl font-bold mt-4'>{profile?.username}</Text>
+            <View className='flex-row items-center justify-center mt-2 gap-4 space-x-2'>
+              <Text className='text-2xl font-bold'>{profile?.username}</Text>
+              <BadgeCheck className='text-xl text-blue-500 self-center' />
+            </View>
+
             <View className='flex-row gap-4 mt-4 w-full px-4 justify-between '>
               <TouchableOpacity onPress={handleLeftIconPress}>
                 <XIcon className='text-xl' />
